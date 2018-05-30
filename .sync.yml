@@ -1,26 +1,38 @@
 ---
 .travis.yml:
-  includes:
-  - rvm: 1.8.7
-    env: PUPPET_GEM_VERSION="~> 3.0" STRICT_VARIABLES="yes" ORDERING="random"
-  - rvm: 1.9.3
-    env: PUPPET_GEM_VERSION="~> 3.0" STRICT_VARIABLES="yes" ORDERING="random"
-  - rvm: 2.0.0
-    env: PUPPET_GEM_VERSION="~> 3.0" STRICT_VARIABLES="yes" ORDERING="random"
-  - rvm: 2.1.6
-    env: PUPPET_GEM_VERSION="~> 4.0" STRICT_VARIABLES="yes" ORDERING="random"
-    allow_failures:
+  docker_sets:
+    - set: docker/debian-8
+    - set: docker/ubuntu-14.04
+  docker_defaults:
+    bundler_args: ""
+  secure: ""
+  branches:
+    - release
+
 Gemfile:
   required:
-    ':development, :unit_tests':
-      - gem: rspec-puppet
-        version: '~> 2.1'
-      - gem: rspec-core
-        version: '3.1.7'
-      - gem: puppetlabs_spec_helper
-      - gem: simplecov
-      - gem: puppet_facts
-      - gem: json
     ':system_tests':
+      - gem: 'puppet-module-posix-system-r#{minor_version}'
+        platforms: ruby
+      - gem: 'puppet-module-win-system-r#{minor_version}'
+        platforms:
+          - mswin
+          - mingw
+          - x64_mingw
+      - gem: beaker
+        version: '~> 3.13'
+        from_env: BEAKER_VERSION
+      - gem: beaker-abs
+        from_env: BEAKER_ABS_VERSION
+        version: '~> 0.1'
+      - gem: beaker-pe
+      - gem: beaker-hostgenerator
+        from_env: BEAKER_HOSTGENERATOR_VERSION
       - gem: beaker-rspec
-      - gem: serverspec
+        from_env: BEAKER_RSPEC_VERSION
+
+appveyor.yml:
+  delete: true
+
+.gitlab-ci.yml:
+  unmanaged: true
